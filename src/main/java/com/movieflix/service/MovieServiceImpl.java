@@ -32,15 +32,9 @@ public class MovieServiceImpl implements MovieService{
         String uploadedFileName = fileService.uploadFile(path, file );
         // set the value of field 'poster' as filename,
         movieDto.setPoster(uploadedFileName);
+        movieDto.setIsDeleted(false);
         // map dto to entity
-        Movie movie = new Movie(movieDto.getId(),
-                movieDto.getTitle(),
-                movieDto.getDirector(),
-                movieDto.getStudio(),
-                movieDto.getMovieCast(),
-                movieDto.getReleaseYear(),
-                movieDto.getPoster(),
-                0);
+        Movie movie = convertToEntity(movieDto);
         // save the movie object and return movie object
         Movie savedMovie = movieRepository.save(movie);
         // generate the poster url
@@ -49,10 +43,21 @@ public class MovieServiceImpl implements MovieService{
         return convertToDto(savedMovie);
     }
 
+    private static Movie convertToEntity(MovieDto movieDto) {
+        return new Movie(movieDto.getId(),
+                movieDto.getTitle(),
+                movieDto.getDirector(),
+                movieDto.getStudio(),
+                movieDto.getMovieCast(),
+                movieDto.getReleaseYear(),
+                movieDto.getPoster(),
+                movieDto.getIsDeleted());
+    }
+
     @Override
     public MovieDto getMovie(Integer movieId) {
         // check the data in db and if exists fetch the data
-        Movie movie = movieRepository.findById(movieId).orElseThrow(()-> new RuntimeException("Movie not found"));
+        Movie movie = movieRepository.findMovieByIdAndIsDeleted(movieId, Boolean.FALSE).orElseThrow(()-> new RuntimeException("Movie not found"));
 
         return convertToDto(movie);
     }
@@ -73,9 +78,30 @@ public class MovieServiceImpl implements MovieService{
 
     @Override
     public List<MovieDto> getMovies() {
-        List<Movie> movies = movieRepository.findAll();
+        List<Movie> movies = movieRepository.findAllByIsDeleted(false);
 
         return movies
-                .stream().map(this::convertToDto).toList();
+                .stream()
+                .map(this::convertToDto).toList();
+    }
+
+    @Override
+    public MovieDto update(MovieDto movieDto,  MultipartFile file) throws IOException {
+        Movie movie = movieRepository.findMovieByIdAndIsDeleted(movieDto.getId(), Boolean.FALSE).orElseThrow(()-> new RuntimeException("Movie not found"));
+        MovieDto dto = convertToDto(movie);
+
+        return addMovie(dto, file);
+    }
+
+    @Override
+    public MovieDto deleteById(Integer movieId) throws IOException {
+        Movie movie = movieRepository.findMovieByIdAndIsDeleted(movieId, Boolean.FALSE).orElseThrow(()-> new RuntimeException("Movie not found"));
+
+        MovieDto movieDto = convertToDto(movie);
+        movieDto.setIsDeleted(true);
+        movie = convertToEntity(movieDto);
+        movieRepository.save(movie);
+
+        return convertToDto(movie);
     }
 }
