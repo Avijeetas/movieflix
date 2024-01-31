@@ -36,4 +36,7 @@ public class MovieDto {
     @NotBlank(message = "Poster should not be null or blank")
     private String posterUrl;
 
+    private Integer isDeleted = 0;
+
+
 }

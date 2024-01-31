@@ -39,7 +39,8 @@ public class MovieServiceImpl implements MovieService{
                 movieDto.getStudio(),
                 movieDto.getMovieCast(),
                 movieDto.getReleaseYear(),
-                movieDto.getPoster());
+                movieDto.getPoster(),
+                0);
         // save the movie object and return movie object
         Movie savedMovie = movieRepository.save(movie);
         // generate the poster url
@@ -65,7 +66,8 @@ public class MovieServiceImpl implements MovieService{
                 movie.getMovieCast(),
                 movie.getReleaseYear(),
                 movie.getPoster(),
-                baseUrl + "/file/" + movie.getPoster()
+                baseUrl + "/file/" + movie.getPoster(),
+                movie.getIsDeleted()
         );
     }
 

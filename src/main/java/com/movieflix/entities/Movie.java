@@ -3,6 +3,7 @@ package com.movieflix.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -39,4 +40,6 @@ public class Movie {
     @Column(nullable=false)
     @NotBlank(message = "Poster should not be null or blank")
     private String poster;
+
+    private Integer isDeleted = 0;
 }
