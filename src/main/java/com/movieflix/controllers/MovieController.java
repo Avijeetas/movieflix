@@ -44,10 +44,14 @@ public class MovieController {
         return objectMapper.readValue(movieDtoObj, MovieDto.class);
     }
 
-    @PutMapping("update")
-    public ResponseEntity<MovieDto> updateMovieHandler(@RequestPart MultipartFile file,
+    @PutMapping("{movieId}")
+    public ResponseEntity<MovieDto> updateMovieHandler(@PathVariable Integer movieId,
+                                                       @RequestPart MultipartFile file,
                                                        @RequestPart String movieDto) throws IOException {
+        if(file.isEmpty()) file = null;
+
         MovieDto dto = convertToMovieDto(movieDto);
+        dto.setId(movieId);
 
         return ResponseEntity.ok(movieService.update(dto, file));
     }

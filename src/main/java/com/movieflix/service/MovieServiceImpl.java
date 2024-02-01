@@ -7,7 +7,11 @@ import com.movieflix.repositories.MovieRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 
@@ -29,11 +33,16 @@ public class MovieServiceImpl implements MovieService{
     @Override
     public MovieDto addMovie(MovieDto movieDto, MultipartFile file) throws IOException {
         // upload the file
+        if(Files.exists(Paths.get(path + File.separator + file.getOriginalFilename()))){
+            throw new RuntimeException("File already exists! Please rename the file name");
+        }
+
         String uploadedFileName = fileService.uploadFile(path, file );
         // set the value of field 'poster' as filename,
         movieDto.setPoster(uploadedFileName);
         movieDto.setIsDeleted(false);
         // map dto to entity
+        movieDto.setId(null);
         Movie movie = convertToEntity(movieDto);
         // save the movie object and return movie object
         Movie savedMovie = movieRepository.save(movie);
@@ -88,20 +97,31 @@ public class MovieServiceImpl implements MovieService{
     @Override
     public MovieDto update(MovieDto movieDto,  MultipartFile file) throws IOException {
         Movie movie = movieRepository.findMovieByIdAndIsDeleted(movieDto.getId(), Boolean.FALSE).orElseThrow(()-> new RuntimeException("Movie not found"));
+        String fileName = movie.getPoster();
+        if(file!=null){
+            Files.deleteIfExists(Paths.get(path + File.separator + fileName));
+            fileName = fileService.uploadFile(path, file);
+        }
         MovieDto dto = convertToDto(movie);
-
-        return addMovie(dto, file);
+        dto.setPoster(fileName);
+        dto.setPosterUrl(baseUrl+"/file/"+fileName);
+        // map dto to entity
+        movie = convertToEntity(movieDto);
+        // save the movie object and return movie object
+        Movie updatedMovie = movieRepository.save(movie);
+        // generate the poster url
+        return  movieDto;
     }
 
     @Override
-    public MovieDto deleteById(Integer movieId) throws IOException {
+    public void deleteById(Integer movieId) throws IOException {
         Movie movie = movieRepository.findMovieByIdAndIsDeleted(movieId, Boolean.FALSE).orElseThrow(()-> new RuntimeException("Movie not found"));
+        Files.deleteIfExists(Paths.get(path + File.separator + movie.getPoster()));
 
         MovieDto movieDto = convertToDto(movie);
         movieDto.setIsDeleted(true);
         movie = convertToEntity(movieDto);
         movieRepository.save(movie);
 
-        return convertToDto(movie);
     }
 }
