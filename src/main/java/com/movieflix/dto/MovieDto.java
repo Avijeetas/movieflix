@@ -1,6 +1,7 @@
 package com.movieflix.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,5 +36,9 @@ public class MovieDto {
 
     @NotBlank(message = "Poster should not be null or blank")
     private String posterUrl;
+
+    @NotNull
+    private Boolean isDeleted;
+
 
 }

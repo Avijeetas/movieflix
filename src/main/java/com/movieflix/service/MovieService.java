@@ -1,7 +1,6 @@
 package com.movieflix.service;
 
 import com.movieflix.dto.MovieDto;
-import com.movieflix.entities.Movie;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -13,4 +12,8 @@ public interface MovieService {
     MovieDto getMovie(Integer movieId);
 
     List<MovieDto> getMovies();
+
+    MovieDto update(MovieDto movieDto, MultipartFile file) throws IOException;
+
+    MovieDto deleteById(Integer movieId) throws IOException;
 }

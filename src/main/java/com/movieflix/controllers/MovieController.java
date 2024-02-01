@@ -3,7 +3,6 @@ package com.movieflix.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.movieflix.dto.MovieDto;
-import com.movieflix.entities.Movie;
 import com.movieflix.service.MovieService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,4 +43,19 @@ public class MovieController {
 
         return objectMapper.readValue(movieDtoObj, MovieDto.class);
     }
+
+    @PutMapping("update")
+    public ResponseEntity<MovieDto> updateMovieHandler(@RequestPart MultipartFile file,
+                                                       @RequestPart String movieDto) throws IOException {
+        MovieDto dto = convertToMovieDto(movieDto);
+
+        return ResponseEntity.ok(movieService.update(dto, file));
+    }
+
+    @DeleteMapping("{movieId}")
+    public ResponseEntity<MovieDto> updateMovieHandler(@PathVariable Integer movieId) throws IOException {
+        movieService.deleteById(movieId);
+        return ResponseEntity.noContent().build();
+    }
+
 }
