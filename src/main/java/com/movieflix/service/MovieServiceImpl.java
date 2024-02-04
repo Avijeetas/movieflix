@@ -2,12 +2,19 @@ package com.movieflix.service;
 
 import com.movieflix.dto.MovieDto;
 import com.movieflix.entities.Movie;
+import com.movieflix.exceptions.EmptyFileException;
+import com.movieflix.exceptions.FileExistsException;
+import com.movieflix.exceptions.MovieNotFoundException;
 import com.movieflix.repositories.MovieRepository;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 
@@ -28,6 +35,13 @@ public class MovieServiceImpl implements MovieService{
 
     @Override
     public MovieDto addMovie(MovieDto movieDto, MultipartFile file) throws IOException {
+        if(file.isEmpty()){
+            throw new EmptyFileException("File not uploaded");
+        }
+
+        if(Files.exists(Paths.get(path+ File.separator + file.getOriginalFilename()))){
+            throw new FileExistsException("File already exists with id = " + movieDto.getId());
+        }
         // upload the file
         String uploadedFileName = fileService.uploadFile(path, file );
         // set the value of field 'poster' as filename,
@@ -57,7 +71,8 @@ public class MovieServiceImpl implements MovieService{
     @Override
     public MovieDto getMovie(Integer movieId) {
         // check the data in db and if exists fetch the data
-        Movie movie = movieRepository.findMovieByIdAndIsDeleted(movieId, Boolean.FALSE).orElseThrow(()-> new RuntimeException("Movie not found"));
+        Movie movie = movieRepository.findMovieByIdAndIsDeleted(movieId, Boolean.FALSE)
+                .orElseThrow(()-> new MovieNotFoundException("Movie not found with id = " + movieId));
 
         return convertToDto(movie);
     }
@@ -87,21 +102,23 @@ public class MovieServiceImpl implements MovieService{
 
     @Override
     public MovieDto update(MovieDto movieDto,  MultipartFile file) throws IOException {
-        Movie movie = movieRepository.findMovieByIdAndIsDeleted(movieDto.getId(), Boolean.FALSE).orElseThrow(()-> new RuntimeException("Movie not found"));
+        Movie movie = movieRepository.findMovieByIdAndIsDeleted(movieDto.getId(), Boolean.FALSE)
+                .orElseThrow(()-> new MovieNotFoundException("Movie not found with id = " + movieDto.getId()));
         MovieDto dto = convertToDto(movie);
 
         return addMovie(dto, file);
     }
 
     @Override
-    public MovieDto deleteById(Integer movieId) throws IOException {
-        Movie movie = movieRepository.findMovieByIdAndIsDeleted(movieId, Boolean.FALSE).orElseThrow(()-> new RuntimeException("Movie not found"));
+    public void deleteById(Integer movieId) {
+        Movie movie = movieRepository.findMovieByIdAndIsDeleted(movieId, Boolean.FALSE)
+                .orElseThrow(()-> new MovieNotFoundException("Movie not found with id = " + movieId));
 
         MovieDto movieDto = convertToDto(movie);
         movieDto.setIsDeleted(true);
         movie = convertToEntity(movieDto);
         movieRepository.save(movie);
 
-        return convertToDto(movie);
+        convertToDto(movie);
     }
 }
