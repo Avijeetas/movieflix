@@ -12,10 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -113,7 +110,7 @@ public class MovieServiceImpl implements MovieService{
     }
 
     @Override
-    public MovieDto deleteById(Integer movieId) throws IOException {
+    public void deleteById(Integer movieId) {
         Movie movie = movieRepository.findMovieByIdAndIsDeleted(movieId, Boolean.FALSE)
                 .orElseThrow(()-> new MovieNotFoundException("Movie not found with id = " + movieId));
 
@@ -122,6 +119,6 @@ public class MovieServiceImpl implements MovieService{
         movie = convertToEntity(movieDto);
         movieRepository.save(movie);
 
-        return convertToDto(movie);
+        convertToDto(movie);
     }
 }
