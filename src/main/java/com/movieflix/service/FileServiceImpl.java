@@ -1,11 +1,11 @@
 package com.movieflix.service;
 
-import org.apache.tomcat.util.http.fileupload.impl.IOFileUploadException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Service
@@ -21,7 +21,7 @@ public class FileServiceImpl implements FileService{
         // create a file object
         File f = new File(path);
         if(!f.exists()){
-            f.mkdir();
+            f.mkdirs();
         }
 
         // copy the file or upload the file
@@ -34,5 +34,16 @@ public class FileServiceImpl implements FileService{
         String filePath = path + File.separator + fileName;
 
         return new FileInputStream(filePath);
+    }
+
+    @Override
+    public void deleteFile(String path, String fileName) throws IOException {
+        String filePath = path + File.separator + fileName;
+
+        Path path1 = Paths.get(filePath);
+        if(!Files.exists(path1)){
+            throw new FileNotFoundException("File not exists");
+        }
+        Files.deleteIfExists(path1);
     }
 }
