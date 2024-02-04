@@ -110,7 +110,7 @@ public class MovieServiceImpl implements MovieService{
     }
 
     @Override
-    public void deleteById(Integer movieId) throws IOException {
+    public void deleteById(Integer movieId) {
         Movie movie = movieRepository.findMovieByIdAndIsDeleted(movieId, Boolean.FALSE)
                 .orElseThrow(()-> new MovieNotFoundException("Movie not found with id = " + movieId));
 
@@ -118,7 +118,7 @@ public class MovieServiceImpl implements MovieService{
         movieDto.setIsDeleted(true);
         movie = convertToEntity(movieDto);
         movieRepository.save(movie);
-        fileService.deleteFile(path, movie.getPoster());
+
         convertToDto(movie);
     }
 }
