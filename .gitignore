@@ -32,3 +32,15 @@ build/
 
 ### VS Code ###
 .vscode/
+/movie-poster/archive/
+/movie-poster/PosterPy/bin/
+/movie-poster/PosterPy/include/
+/movie-poster/PosterPy/lib/
+/movie-poster/PosterPy/api.txt
+/movie-poster/PosterPy/LICENSE
+/movie-poster/api.txt
+/movie-poster/app.log
+/movie-poster/config.py
+/movie-poster/PosterPy/bin/
+/movie-poster/PosterPy/include/
+/movie-poster/PosterPy/lib/
