@@ -7,6 +7,8 @@ import com.movieflix.exceptions.FileExistsException;
 import com.movieflix.exceptions.MovieNotFoundException;
 import com.movieflix.repositories.MovieRepository;
 
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,8 +18,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-
+@Slf4j
 @Service
 public class MovieServiceImpl implements MovieService{
     private final FileService fileService;
@@ -57,14 +61,17 @@ public class MovieServiceImpl implements MovieService{
         return convertToDto(savedMovie);
     }
 
-    private static Movie convertToEntity(MovieDto movieDto) {
+    private Movie convertToEntity(MovieDto movieDto) {
         return new Movie(movieDto.getId(),
                 movieDto.getTitle(),
-                movieDto.getDirector(),
-                movieDto.getStudio(),
+                movieDto.getDirectors(),
+                movieDto.getCountries(),
                 movieDto.getMovieCast(),
+                movieDto.getGenre(),
                 movieDto.getReleaseYear(),
+                movieDto.getDuration(),
                 movieDto.getPoster(),
+                movieDto.getDescription(),
                 movieDto.getIsDeleted());
     }
 
@@ -81,10 +88,13 @@ public class MovieServiceImpl implements MovieService{
         return new MovieDto(
                 movie.getId(),
                 movie.getTitle(),
-                movie.getDirector(),
-                movie.getStudio(),
+                movie.getDirectors(),
+                movie.getCountries(),
                 movie.getMovieCast(),
+                movie.getGenre(),
+                movie.getDescription(),
                 movie.getReleaseYear(),
+                movie.getDuration(),
                 movie.getPoster(),
                 baseUrl + "/file/" + movie.getPoster(),
                 movie.getIsDeleted()
@@ -110,7 +120,7 @@ public class MovieServiceImpl implements MovieService{
     }
 
     @Override
-    public void deleteById(Integer movieId) {
+    public void deleteById(Integer movieId) throws IOException {
         Movie movie = movieRepository.findMovieByIdAndIsDeleted(movieId, Boolean.FALSE)
                 .orElseThrow(()-> new MovieNotFoundException("Movie not found with id = " + movieId));
 
@@ -118,7 +128,18 @@ public class MovieServiceImpl implements MovieService{
         movieDto.setIsDeleted(true);
         movie = convertToEntity(movieDto);
         movieRepository.save(movie);
+        Files.deleteIfExists(Paths.get(path+ File.separator+movie.getPoster()));
+    }
 
-        convertToDto(movie);
+    @Override
+    public MovieDto populateMovies(MovieDto movieDto) {
+        List<Movie> savedMovies = Stream.of(movieDto)
+                .map(this::convertToEntity)
+                .map(movieRepository::save)  // Save each movie to the repository
+                .toList();  // Collect saved movies into a list
+
+        savedMovies.forEach(movie -> log.info("Movie saved with id {}", movie.getId()));
+
+        return convertToDto(savedMovies.get(0));
     }
 }

@@ -17,4 +17,6 @@ public interface MovieService {
     MovieDto update(MovieDto movieDto, MultipartFile file) throws IOException, FileExistsException;
 
     void deleteById(Integer movieId) throws IOException;
+
+    MovieDto populateMovies(MovieDto movieDto);
 }
