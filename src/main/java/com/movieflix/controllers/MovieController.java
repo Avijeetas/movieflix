@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/movies")
@@ -56,6 +57,12 @@ public class MovieController {
     public ResponseEntity<MovieDto> updateMovieHandler(@PathVariable Integer movieId) throws IOException {
         movieService.deleteById(movieId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/populate-movies")
+    public ResponseEntity<MovieDto> postingData(@RequestBody String movieDto) throws JsonProcessingException {
+        MovieDto dto = convertToMovieDto(movieDto);
+        return ResponseEntity.ok(movieService.populateMovies(dto));
     }
 
 }
