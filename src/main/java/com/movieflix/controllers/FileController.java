@@ -1,6 +1,7 @@
 package com.movieflix.controllers;
 
 import com.movieflix.service.FileService;
+import com.movieflix.utils.AppConstants;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +29,7 @@ public class FileController {
     @PostMapping("upload")
     private ResponseEntity<String> uploadFileHandle(@RequestPart MultipartFile file) throws IOException{
         String uploadedFileName = fileService.uploadFile(path, file );
-        return ResponseEntity.ok("File uploaded : "+ uploadedFileName);
+        return ResponseEntity.ok(String.format(AppConstants.FILE_UPLOADED_MSG, uploadedFileName));
     }
 
     @GetMapping("{fileName}")

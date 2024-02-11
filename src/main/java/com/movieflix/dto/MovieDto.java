@@ -1,5 +1,6 @@
 package com.movieflix.dto;
 
+import com.movieflix.utils.AppConstants;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -15,31 +16,31 @@ import java.util.Set;
 public class MovieDto {
     private Integer id;
 
-    @NotBlank(message = "Title should not be null or blank")
+    @NotBlank(message = AppConstants.TITLE_SHOULD_NOT_BE_NULL_OR_BLANK)
     private String title;
 
 
-    @NotEmpty(message = "Name should not be null or blank")
+    @NotEmpty(message = AppConstants.NAME_SHOULD_NOT_BE_NULL_OR_BLANK)
     private Set<String> directors;
-    @NotEmpty(message = "countries should not be null or blank")
+    @NotEmpty(message = AppConstants.COUNTRIES_SHOULD_NOT_BE_NULL_OR_BLANK)
     private Set<String> countries;
-    @NotEmpty(message = "actors should not be null or blank")
+    @NotEmpty(message = AppConstants.ACTORS_SHOULD_NOT_BE_NULL_OR_BLANK)
     private Set<String> movieCast;
 
 
-    @NotEmpty(message = "genre should not be null or blank")
+    @NotEmpty(message = AppConstants.GENRE_SHOULD_NOT_BE_NULL_OR_BLANK)
     private Set<String> genre;
 
 
-    @NotBlank(message = "Description should not be null or blank")
+    @NotBlank(message = AppConstants.DESCRIPTION_SHOULD_NOT_BE_NULL_OR_BLANK)
     private String description;
 
     private Integer releaseYear;
     private Integer duration;
-    @NotBlank(message = "Poster should not be null or blank")
+    @NotBlank(message = AppConstants.POSTER_SHOULD_NOT_BE_NULL_OR_BLANK)
     private String poster;
 
-    @NotBlank(message = "Poster should not be null or blank")
+    @NotBlank(message = AppConstants.POSTER_URL_NOT_BLANK_OR_NULL_MSG)
     private String posterUrl;
 
     @NotNull

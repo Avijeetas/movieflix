@@ -1,5 +1,6 @@
 package com.movieflix.entities;
 
+import com.movieflix.utils.AppConstants;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -19,7 +20,7 @@ public class Movie {
     private Integer id;
 
     @Column(nullable=false)
-    @NotBlank(message = "Title should not be null or blank")
+    @NotBlank(message = AppConstants.TITLE_SHOULD_NOT_BE_NULL_OR_BLANK)
     private String title;
 
 
@@ -42,7 +43,7 @@ public class Movie {
     private Integer releaseYear;
     private Integer duration;
     @Column(nullable=false)
-    @NotBlank(message = "Poster should not be null or blank")
+    @NotBlank(message = AppConstants.POSTER_SHOULD_NOT_BE_NULL_OR_BLANK)
 
     private String poster;
     @Column(columnDefinition = "TEXT")
