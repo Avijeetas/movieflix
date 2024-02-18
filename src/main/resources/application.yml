@@ -14,7 +14,7 @@ spring:
 
 project:
   poster: posters/
-  refreshTokenValidity: 24*60*60
+  refreshTokenValidity: 86400
 
 base:
   url: "http://localhost:8080"
