@@ -5,10 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,6 +24,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "users")
 @Getter
+@Builder
 public class User implements UserDetails {
    public static final String EMAIL_CAN_NOT_BE_BLANK = "Email can not be blank";
    public static final String THE_PASSWORD_MUST_HAVE_AT_LEAST_8_CHARACTERS = "The password must have at least 8 characters";
