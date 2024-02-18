@@ -31,7 +31,7 @@ public class AuthService {
    private final JwtService jwtService;
    private final AuthenticationManager authenticationManager;
    public AuthResponse register(RegisterRequest registerRequest) {
-      User user = User
+      var user = User
               .builder()
               .name(registerRequest.getName())
               .email(registerRequest.getEmail())

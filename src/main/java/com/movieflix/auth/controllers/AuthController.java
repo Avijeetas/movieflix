@@ -5,7 +5,6 @@ import com.movieflix.auth.entities.RefreshToken;
 import com.movieflix.auth.entities.User;
 import com.movieflix.auth.repositories.UserRepository;
 import com.movieflix.auth.services.AuthService;
-import com.movieflix.auth.services.JwtService;
 import com.movieflix.auth.services.RefreshTokenService;
 import com.movieflix.auth.services.UserService;
 import com.movieflix.utils.AuthResponse;
@@ -16,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Avijeet
