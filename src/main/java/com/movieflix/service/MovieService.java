@@ -1,6 +1,7 @@
 package com.movieflix.service;
 
 import com.movieflix.dto.MovieDto;
+import com.movieflix.dto.MoviePageResponse;
 import com.movieflix.exceptions.FileExistsException;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,4 +20,9 @@ public interface MovieService {
     void deleteById(Integer movieId) throws IOException;
 
     MovieDto populateMovies(MovieDto movieDto);
+
+    MoviePageResponse getAllMoviesPaged(Integer pageNumber, Integer pageSize);
+
+    MoviePageResponse getAllMoviesSorted(Integer pageNumber, Integer pageSize,
+                                                           String sortBy, String dir);
 }
