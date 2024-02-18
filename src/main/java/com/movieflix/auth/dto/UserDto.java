@@ -28,12 +28,4 @@ public class UserDto {
 
     private UserRole role;
 
-    private boolean isEnabled;
-
-    private boolean isAccountNonExpired;
-
-    private boolean isAccountNonLocked ;
-
-
-    private boolean isCredentialsNonExpired;
 }

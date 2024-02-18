@@ -1,4 +1,4 @@
-package com.movieflix.auth.controllers;
+package com.movieflix.controllers;
 
 import com.movieflix.auth.dto.UserDto;
 import com.movieflix.auth.entities.RefreshToken;
@@ -11,7 +11,12 @@ import com.movieflix.utils.AuthResponse;
 import com.movieflix.utils.LoginRequest;
 import com.movieflix.utils.RefreshTokenRequest;
 import com.movieflix.utils.RegisterRequest;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -50,7 +55,13 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(loginRequest));
     }
 
+    @PostMapping("logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
+        authService.logout(request);
+        return ResponseEntity.ok().build();
+    }
     @PostMapping("refresh")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     public ResponseEntity<AuthResponse> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest){
         RefreshToken refreshToken = refreshTokenService.verifyRefreshToken(refreshTokenRequest.getRefreshToken());
         User user = refreshToken.getUser();
@@ -61,11 +72,13 @@ public class AuthController {
     }
 
     @PutMapping("all")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<List<UserDto>> updateUserInfos(){
         return ResponseEntity
                 .ok(userService.getAllEnabledUsers());
     }
     @DeleteMapping()
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<String> deleteRecords(){
         userRepository.deleteAll();
         return ResponseEntity.ok("Done");

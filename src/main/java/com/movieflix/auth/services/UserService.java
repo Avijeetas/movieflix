@@ -23,14 +23,16 @@ public class UserService {
    private final UserRepository userRepository;
 
    public List<UserDto> getAllEnabledUsers(){
-      return userRepository.findAllByIsEnabled(Boolean.TRUE)
+      return userRepository.findAll()
               .stream()
+              .filter(User::isEnabled)
               .map(this::convertToDto)
               .collect(Collectors.toList());
    }
    public List<UserDto> getAllDisabledUsers(){
-      return userRepository.findAllByIsEnabled(Boolean.FALSE)
+      return userRepository.findAll()
               .stream()
+              .filter(User::isEnabled)
               .map(this::convertToDto)
               .collect(Collectors.toList());
    }
@@ -40,10 +42,6 @@ public class UserService {
               .name(user.getName())
               .role(user.getRole())
               .username(user.getUsername())
-              .isEnabled(user.isEnabled())
-              .isCredentialsNonExpired(user.isCredentialsNonExpired())
-              .isAccountNonExpired(user.isAccountNonExpired())
-              .isAccountNonLocked(user.isAccountNonLocked())
               .build();
    }
 }

@@ -4,6 +4,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +26,7 @@ import java.io.IOException;
  **/
 
 @Service
+@Slf4j
 public class AuthFilterService extends OncePerRequestFilter {
     private final JwtService jwtService;
 
@@ -37,12 +41,20 @@ public class AuthFilterService extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         final String authHeader=  request.getHeader("Authorization");
+        String apiName = null;
+        apiName = (request.getRequestURI());
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")){
-            filterChain.doFilter(request, response);
+        if (apiName !=null && (authHeader == null || !authHeader.startsWith("Bearer "))){
+            if(apiName.contains("register") || (apiName.contains("login"))){
+                filterChain.doFilter(request, response);
+                return;
+            }
+            log.info("You need to login/register");
+            response.sendRedirect("/login");
             return;
         }
         // extract jwt
+        assert authHeader!=null;
         String jwt = authHeader.substring(7);
 
         String username = jwtService.extractUsername(jwt);

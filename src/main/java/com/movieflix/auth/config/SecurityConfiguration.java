@@ -33,7 +33,7 @@ public class SecurityConfiguration {
       httpSecurity
               .csrf(AbstractHttpConfigurer::disable)
               .authorizeHttpRequests(auth->
-                      auth.requestMatchers("/api/v1/auth/**")
+                      auth.requestMatchers("/api/v1/**")
                               .permitAll()
                               .anyRequest()
                               .authenticated())
@@ -43,4 +43,5 @@ public class SecurityConfiguration {
               .addFilterBefore(authFilterService, UsernamePasswordAuthenticationFilter.class);
       return  httpSecurity.build();
    }
+
 }
