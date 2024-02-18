@@ -1,15 +1,16 @@
 package com.movieflix.service;
 
 import com.movieflix.dto.MovieDto;
+import com.movieflix.dto.MoviePageResponse;
 import com.movieflix.entities.Movie;
 import com.movieflix.exceptions.EmptyFileException;
 import com.movieflix.exceptions.FileExistsException;
 import com.movieflix.exceptions.MovieNotFoundException;
 import com.movieflix.repositories.MovieRepository;
-
 import com.movieflix.utils.AppConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,9 +21,16 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 @Slf4j
 @Service
-public class MovieServiceImpl implements MovieService{
+public class MovieServiceImpl implements MovieService {
     private final FileService fileService;
     private final MovieRepository movieRepository;
     @Value("${project.poster}")
@@ -38,16 +46,16 @@ public class MovieServiceImpl implements MovieService{
 
     @Override
     public MovieDto addMovie(MovieDto movieDto, MultipartFile file) throws IOException {
-        if(file.isEmpty()){
+        if (file.isEmpty()) {
             throw new EmptyFileException(AppConstants.FILE_NOT_UPLOADED_MSG);
         }
 
-        if(Files.exists(Paths.get(path+ File.separator + file.getOriginalFilename()))){
+        if (Files.exists(Paths.get(path + File.separator + file.getOriginalFilename()))) {
             throw new FileExistsException(
                     String.format(AppConstants.FILE_ALREADY_EXISTS_WITH_FILE_NAME, file.getOriginalFilename()));
         }
         // upload the file
-        String uploadedFileName = fileService.uploadFile(path, file );
+        String uploadedFileName = fileService.uploadFile(path, file);
         // set the value of field 'poster' as filename,
         movieDto.setPoster(uploadedFileName);
         movieDto.setIsDeleted(false);
@@ -85,7 +93,7 @@ public class MovieServiceImpl implements MovieService{
 
     private Movie getMovieById(Integer movieId) {
         return movieRepository.findMovieByIdAndIsDeleted(movieId, Boolean.FALSE)
-                .orElseThrow(()-> new MovieNotFoundException(
+                .orElseThrow(() -> new MovieNotFoundException(
                         String.format(AppConstants.MOVIE_NOT_FOUND_WITH_ID_MSG, movieId)));
     }
 
@@ -116,7 +124,7 @@ public class MovieServiceImpl implements MovieService{
     }
 
     @Override
-    public MovieDto update(MovieDto movieDto,  MultipartFile file) throws IOException {
+    public MovieDto update(MovieDto movieDto, MultipartFile file) throws IOException {
         Movie movie = getMovieById(movieDto.getId());
         MovieDto dto = convertToDto(movie);
 
@@ -131,7 +139,7 @@ public class MovieServiceImpl implements MovieService{
         movieDto.setIsDeleted(true);
         movie = convertToEntity(movieDto);
         movieRepository.save(movie);
-        Files.deleteIfExists(Paths.get(path+ File.separator+movie.getPoster()));
+        Files.deleteIfExists(Paths.get(path + File.separator + movie.getPoster()));
     }
 
     @Override
@@ -144,5 +152,39 @@ public class MovieServiceImpl implements MovieService{
         savedMovies.forEach(movie -> log.info("Movie saved with id {}", movie.getId()));
 
         return convertToDto(savedMovies.getFirst());
+    }
+
+    @Override
+    public MoviePageResponse getAllMoviesPaged(Integer pageNumber, Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        return getMoviePageResponse(pageNumber, pageSize, pageable);
+
+    }
+
+    private MoviePageResponse getMoviePageResponse(Integer pageNumber, Integer pageSize, Pageable pageable) {
+        Page<Movie> moviePage = movieRepository.findAllByIsDeleted(Boolean.FALSE, pageable);
+
+        List<MovieDto> movies = moviePage
+                .getContent()
+                .stream()
+                .filter(movie -> !movie.getIsDeleted())
+                .map(this::convertToDto)
+                .toList();
+
+        return new MoviePageResponse(movies,
+                pageNumber,
+                pageSize, moviePage.getTotalElements(),
+                moviePage.getTotalPages(), moviePage.isLast());
+    }
+
+    @Override
+    public MoviePageResponse getAllMoviesSorted(Integer pageNumber, Integer pageSize, String sortBy, String dir) {
+        Sort sort = dir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+
+        return getMoviePageResponse(pageNumber, pageSize, pageable);
     }
 }

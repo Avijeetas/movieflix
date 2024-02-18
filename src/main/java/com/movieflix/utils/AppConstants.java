@@ -8,7 +8,7 @@ package com.movieflix.utils;
  **/
 public class AppConstants {
    public static final String FILE_NOT_UPLOADED_MSG = "File not uploaded";
-   public static final String FILE_ALREADY_EXISTS_WITH_FILE_NAME = "File already exists with id %d";
+   public static final String FILE_ALREADY_EXISTS_WITH_FILE_NAME = "File already exists with id %s";
 
    public static final String MOVIE_NOT_FOUND_WITH_ID_MSG = "Movie not found with id = %s";
    public static final String FILE_UPLOADED_MSG = "File uploaded with filename %s";
@@ -23,4 +23,10 @@ public class AppConstants {
    public static final String TITLE_SHOULD_NOT_BE_NULL_OR_BLANK = "Title should not be null or blank";
    public static final String USER_NAME_SHOULD_NOT_BE_NULL_OR_BLANK = "Username should not be null or blank";
    public static final String USER_NOT_FOUND_WITH_EMAIL = "User not found with email %s";
+   public static final String PAGE_NUMBER = "0";
+   public static final String PAGE_SIZE = "5";
+
+   public static final String SORT_BY = "id";
+
+   public static final String SORT_DIR = "asc";
 }
