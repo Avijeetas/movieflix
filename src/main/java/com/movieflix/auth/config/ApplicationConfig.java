@@ -1,18 +1,20 @@
 package com.movieflix.auth.config;
 
-import com.movieflix.auth.repositories.UserRepository;
-import com.movieflix.utils.AppConstants;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * @author Avijeet
@@ -25,14 +27,25 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class ApplicationConfig {
 
 
-    private final UserRepository userRepository;
+    @Value("${base.auth_url}")
+    private String AUTH_URL;
+    private final RestTemplate restTemplate;
+
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(
-                        String.format(AppConstants.USER_NOT_FOUND_WITH_EMAIL, username)));
-    }
+
+        return username -> {
+            // Make HTTP request to user service for user details
+            String userDetailsServiceUrl = AUTH_URL + "/fetch?username=" + username;
+            UserDetails userDetails = restTemplate.getForObject(userDetailsServiceUrl, UserDetails.class);
+
+            if (userDetails == null) {
+                throw new UsernameNotFoundException("User not found with username: " + username);
+            }
+
+            return userDetails;
+        };    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
