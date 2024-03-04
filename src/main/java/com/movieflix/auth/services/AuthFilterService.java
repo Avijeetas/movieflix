@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.UriTemplate;
@@ -55,10 +56,21 @@ public class AuthFilterService extends OncePerRequestFilter {
         // extract jwt
         assert authHeader!=null;
         String jwt = authHeader.substring(7);
-        ResponseEntity<Boolean> responseFromSSO = restTemplate.getForEntity(
-                AUTH_URL+"/validate?token="
-                        + jwt, Boolean.class);
+        ResponseEntity<Boolean> responseFromSSO;
+        try {
+            responseFromSSO = restTemplate.getForEntity(AUTH_URL + "/validate?token=" + jwt, Boolean.class);
+        } catch (RestClientException ex) {
+            log.error("Error while calling authentication service", ex);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
 
+        // Check if authentication was successful
+        if (responseFromSSO.getStatusCode() == HttpStatus.OK && Objects.equals(responseFromSSO.getBody(), Boolean.TRUE)) {
+            filterChain.doFilter(request, response);
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        }
 
 
         if(Objects.equals(responseFromSSO.getBody(), Boolean.TRUE)){
