@@ -7,5 +7,5 @@ package com.movieflix.service;
  * @date 03-09-2024
  **/
 public interface SmsService {
-    public void sendSms(String toNumber, String messageBody);
+    void sendSms(String toNumber, String messageBody);
 }
