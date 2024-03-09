@@ -44,3 +44,4 @@ build/
 /movie-poster/PosterPy/bin/
 /movie-poster/PosterPy/include/
 /movie-poster/PosterPy/lib/
+/src/main/resources/application-dev.yml
