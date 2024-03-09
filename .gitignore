@@ -41,7 +41,4 @@ build/
 /movie-poster/api.txt
 /movie-poster/app.log
 /movie-poster/config.py
-/movie-poster/PosterPy/bin/
-/movie-poster/PosterPy/include/
-/movie-poster/PosterPy/lib/
 /src/main/resources/application-dev.yml
